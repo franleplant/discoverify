@@ -7,22 +7,8 @@ import {
   View,
   Navigator,
 } from 'react-native';
-import Landing from './scenes/Landing'
-import Main from './scenes/Main'
+import routes from './routes';
 
-const ROUTES = [
-  {Component: Landing, index: 'Landing'},
-  {Component: Main, index: 'Main'},
-]
-
-const routes = (index: string) => {
-  const res = ROUTES.find(el => el.index === index)
-  if (!res) {
-    throw new Error(`Route not found`);
-  }
-
-  return res;
-}
 
 export default class App extends Component {
   render() {
@@ -33,9 +19,11 @@ export default class App extends Component {
           const { Component } = route;
           return (
             <Component
+
               router={{
                 navigator: navigator,
                 routes: routes,
+                params: route.params,
               }}
             />
           )

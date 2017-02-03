@@ -4,54 +4,136 @@ import {
   AppRegistry,
   StyleSheet,
   Text,
-  View
+  View,
+  TextInput,
+  TouchableHighlight,
+  ActivityIndicator,
+  ScrollView,
 } from 'react-native';
-import { Container, Grid, Row, Col, Header, Title, Content, Footer, FooterTab, Button, Icon } from 'native-base';
+import type {Artist, Album, Track } from '../types'
+import routes from '../routes'
+import spotify from '../spotify'
+import Error from '../components/Error'
+import ArtistList from '../components/ArtistList'
 
 type Props = {
   router: {
     navigator: any,
     routes: any,
+    params: any,
   },
 }
 
+type State = {
+  loading: boolean;
+  error: string;
+  results: SearchResults;
+  fields: {
+    searchTerm: string;
+  }
+}
+
+type SearchResultItem<T> = {
+  href: string,
+  items: Array<T>,
+  limit: number,
+  next: string,
+  previous: string,
+  offset: number,
+}
+
+type SearchResults = {
+  albums: ?SearchResultItem<Album>,
+  artist: ?SearchResultItem<Artist>,
+  tracks: ?SearchResultItem<Tracks>,
+}
+
+
 export default class Landing extends Component {
   props: Props;
+  state: State = {
+    loading: false,
+    error: '',
+    results: {},
+    fields: {
+      searchTerm: '',
+    }
+  };
+
+  handleSearch = async () => {
+    const searchTerm = this.state.fields.searchTerm;
+
+    this.setState(state => {
+      state.loading = true;
+      state.results = {};
+      return state;
+    });
+
+
+    try {
+      const data = await spotify.search(searchTerm, ['album', 'artist', 'track'])
+      console.log(data.body)
+      this.setState(state => {
+        state.loading = false;
+        state.results = data.body;
+        return state;
+      });
+
+    } catch (err) {
+       console.log('Something went wrong!', err);
+        this.setState(state => {
+          state.loading = false;
+          state.error = 'Something went wrong, please try again';
+          return state;
+        });
+    }
+  }
+
+  handleChange = (fieldName: string, value: string) => {
+    this.setState(state => {
+      state.fields[fieldName] = value;
+      return state;
+    })
+  }
+
+  handleArtistPress = (artist: Artist) => {
+    this.props.router.navigator.push(routes('Artist', artist))
+  }
+
   render() {
+    const {loading, error, fields, results} = this.state;
+    const noResults = (!results.artists && !results.albums && !results.tracks)
+
     return (
-      <Container>
-        <Header>
-          <Title>Header</Title>
-        </Header>
+      <ScrollView style={styles.container} keyboardShouldPersistTaps={'always'}>
+        <View style={styles.searchContainer}>
+          <TextInput
+            placeholder={'Search for Artists, Albums and Songs'}
+            value={fields.searchTerm}
+            onChangeText={this.handleChange.bind(null, 'searchTerm')}
+            style={styles.searchInput}
+          />
 
-        <Content contentContainerStyle={{flex: 1}}>
-          <Grid>
+          <TouchableHighlight onPress={this.handleSearch} style={styles.searchButton}>
+            <View>
+              <Text style={{color: 'white'}}>Search</Text>
+            </View>
+          </TouchableHighlight>
+        </View>
 
-            <Row></Row>
-            <Row style={{alignItems: 'center', justifyContent: 'center'}}>
-              <Col></Col>
-              <Col>
-                <Button success block onPress={() => {}}>
-                  <Text>Login with Spotify</Text>
-                  {/*
-                  <Icon name='login' />
-                  */}
-                </Button>
-              </Col>
-              <Col></Col>
-            </Row>
-            <Row></Row>
-          </Grid>
-        </Content>
+        <Error msg={error} />
+        <ActivityIndicator animating={loading} style={{margin: 10}}/>
 
-        <Footer>
-          <FooterTab>
-            <Button transparent onPress={() => this.props.router.navigator.push(this.props.router.routes('Main'))}>
-                <Icon name='ios-call' />
-            </Button>
-          </FooterTab>
-        </Footer>
-      </Container>
+        { noResults &&
+          <Text style={{color: 'white'}}>
+          Search for Artists, Albums and Tracks and tap them to see
+          more content like it.
+          </Text>
+        }
+
+        <ArtistList artists={results.artists ? results.artists.items : []} onArtistPress={this.handleArtistPress}/>
+
+      </ScrollView>
     );
   }
 }
@@ -59,18 +141,32 @@ export default class Landing extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: 50,
+    paddingLeft: 20,
+    paddingRight: 20,
+    backgroundColor: '#2C3E50',
+  },
+
+  searchContainer: {
+    flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    alignItems: 'center'
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
+
+  searchInput: {
+    flex: 1,
+    height: 40,
+    backgroundColor: '#EEEEEE',
+    padding: 10,
+    marginRight: 10
   },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
+
+  searchButton: {
+    width: 80,
+    height: 40,
+    backgroundColor: '#663399',
+    padding: 10,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
 });
