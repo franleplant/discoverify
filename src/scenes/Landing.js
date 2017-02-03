@@ -20,9 +20,12 @@ type Props = {
 }
 
 type State = {
-  loading: boolean;
-  error: string;
-  results: SearchResults;
+  loading: boolean,
+  error: string,
+  results: SearchResults,
+  artistTrackMap: {
+    [artistId: string]: Array<Track>,
+  },
   fields: {
     searchTerm: string;
   }
@@ -51,6 +54,7 @@ export default class Landing extends Component {
     loading: false,
     error: '',
     results: {},
+    artistTrackMap: {},
     fields: {
       searchTerm: '',
     }
@@ -69,20 +73,42 @@ export default class Landing extends Component {
     try {
       const data = await spotify.search(searchTerm, ['album', 'artist', 'track'])
       console.log(data.body)
+
+      let artists = []
+      try {
+        artists = data.body.artists.items;
+      } catch(er) {}
+
+      const artistTrackMap = await this.fetchArtistsTopTracks(artists.map(a => a.id))
+      console.log(artistTrackMap)
+
       this.setState(state => {
         state.loading = false;
         state.results = data.body;
+        state.artistTrackMap = artistTrackMap;
         return state;
       });
 
+
     } catch (err) {
-       console.log('Something went wrong!', err);
-        this.setState(state => {
-          state.loading = false;
-          state.error = 'Something went wrong, please try again';
-          return state;
-        });
+      console.log('Something went wrong!', err);
+      this.setState(state => {
+        state.loading = false;
+        state.error = 'Something went wrong, please try again';
+        return state;
+      });
     }
+  }
+
+  fetchArtistsTopTracks = async (ids: Array<string>) => {
+    const responses = await Promise.all(ids.map(id => spotify.getArtistTopTracks(id, 'Ar')))
+    const artistTrackMap = {}
+    responses.forEach((res, i) => {
+      const artistId = ids[i];
+      artistTrackMap[artistId] = res.body.tracks;
+    })
+
+    return artistTrackMap;
   }
 
   handleChange = (fieldName: string, value: string) => {
@@ -93,7 +119,7 @@ export default class Landing extends Component {
   }
 
   render() {
-    const {loading, error, fields, results} = this.state;
+    const {loading, error, fields, results, artistTrackMap} = this.state;
     const { artists, albums, tracks }: SearchResults = results;
     const noResults = (!artists && !albums && !tracks)
 
@@ -124,7 +150,7 @@ export default class Landing extends Component {
           </Text>
         }
 
-        <ArtistList artists={artists ? artists.items : []}/>
+        <ArtistList artists={artists ? artists.items : []} topTracks={artistTrackMap}/>
 
       </ScrollView>
     );

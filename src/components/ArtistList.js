@@ -9,15 +9,19 @@ import {
   Image,
 } from 'react-native';
 import {Actions as RouterActions} from 'react-native-router-flux';
-import type {Artist } from '../types'
+import type { Artist, Track } from '../types'
 
 type Props = {
   artists: Array<Artist>,
+  topTracks?: {
+    [artistId: string]: Array<Track>,
+  },
   limit?: number,
+  title?: string,
 }
 
 export default function ArtistList(props: Props) {
-  const {limit = 5} = props;
+  const {limit = 5, title = 'Artists', topTracks = {}} = props;
 
   if (props.artists.length === 0) {
     return null;
@@ -25,21 +29,31 @@ export default function ArtistList(props: Props) {
 
   return (
     <View style={{}}>
-      <Text style={styles.title}>Artists</Text>
-      {props.artists.slice(0, limit).map((artist, index) => (
-        <TouchableHighlight
-          key={index}
-          style={styles.touchableItemContainer}
-          onPress={() => RouterActions.Artist({artist})}
-        >
-          <View style={styles.itemContainer}>
-            <Image style={styles.artistImage} source={{uri: artist.images[0] ? artist.images[0].url : undefined}}/>
-            <Text style={{backgroundColor: 'rgba(0,0,0,0)', color: 'white', flex: 1, minWidth: 200}}>
-              {artist.name}
-            </Text>
-          </View>
-        </TouchableHighlight>
-      ))}
+      <Text style={styles.title}>{title}</Text>
+      {props.artists.slice(0, limit).map((artist, index) => {
+        let trackPreview = null;
+        let artistTopTracks = topTracks[artist.id]
+        if (artistTopTracks) {
+          trackPreview = (
+            <Text style={{width: 30}}>Play</Text>
+          )
+        }
+        return (
+          <TouchableHighlight
+            key={index}
+            style={styles.touchableItemContainer}
+            onPress={() => RouterActions.Artist({artist})}
+          >
+            <View style={styles.itemContainer}>
+              <Image style={styles.artistImage} source={{uri: artist.images[0] ? artist.images[0].url : undefined}}/>
+              <Text style={styles.itemText}>
+                {artist.name}
+              </Text>
+              {trackPreview}
+            </View>
+          </TouchableHighlight>
+        )
+      })}
     </View>
   )
 }
@@ -60,6 +74,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+
+  itemText: {
+    backgroundColor: 'rgba(0,0,0,0)',
+    color: 'white',
+    flex: 1,
+    minWidth: 200,
   },
 
   title: {

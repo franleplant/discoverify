@@ -6,16 +6,18 @@ import {
   Text,
   View,
   ScrollView,
+  Image,
   ActivityIndicator,
+  TouchableHighlight,
 } from 'react-native';
+import {Actions as RouterActions} from 'react-native-router-flux';
+import type {Artist, Album, Track } from '../types'
+import spotify from '../spotify'
 import Error from '../components/Error'
+import RelatedArtists from '../components/RelatedArtists'
 
 type Props = {
-  router: {
-    navigator: any,
-    routes: any,
-    params: any,
-  },
+  artist: Artist,
 }
 
 type State = {
@@ -23,24 +25,55 @@ type State = {
   error: string,
 }
 
-export default class Main extends Component {
+
+export default class ArtistView extends Component {
   props: Props;
   state: State = {
-    loading: true,
+    relatedArtists: {artists: []},
+    loading: false,
     error: '',
   };
 
+  constructor(...args: Array<any>) {
+    super(...args);
+
+  }
+
   render() {
-    const error = '';
-    const loading = false;
-    const artist = this.props.router.params;
+    const { loading, error } = this.state;
+    const artist = this.props.artist;
+    const artistId = artist.id;
+    const images = artist.images;
+    const imageSource = { uri: images[0] ? artist.images[0].url : undefined }
 
     return (
       <ScrollView style={styles.container} keyboardShouldPersistTaps={'always'}>
-        <Text style={{color: 'white'}}>{artist.name}</Text>
-
         <Error msg={error} />
         <ActivityIndicator animating={loading} style={{margin: 10}}/>
+
+        <View style={{
+          flexDirection: 'row',
+          minHeight: 200,
+          marginBottom: 20,
+        }}>
+
+          <View style={styles.artistImageContainer}>
+            <Image style={styles.artistImage} source={imageSource}/>
+          </View>
+          <Text style={styles.title}>{artist.name}</Text>
+        </View>
+
+        <View
+          style={{
+            flexDirection: 'row',
+          }}
+        >
+          <Text style={{color: 'white', marginRight: 20}}>Genres:</Text>
+          <Text style={{color: 'white'}}>{artist.genres.join(', ')}</Text>
+        </View>
+
+
+        <RelatedArtists artistId={artistId}/>
 
 
       </ScrollView>
@@ -51,32 +84,33 @@ export default class Main extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 50,
+    paddingTop: 80,
     paddingLeft: 20,
     paddingRight: 20,
     backgroundColor: '#2C3E50',
   },
 
-  searchContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
 
-  searchInput: {
+  title: {
     flex: 1,
-    height: 40,
-    backgroundColor: '#EEEEEE',
-    padding: 10,
-    marginRight: 10
+    //minHeight: 200,
+    alignSelf: 'center',
+    fontSize: 20,
+    color: 'white',
   },
 
-  searchButton: {
-    width: 80,
-    height: 40,
-    backgroundColor: '#663399',
-    padding: 10,
-    justifyContent: 'center',
-    alignItems: 'center'
+  artistImageContainer: {
+    width: 200,
+    height: 200,
+    backgroundColor: 'white',
+    marginRight: 20,
   },
+  artistImage: {
+    flex: 1,
+    width: null,
+    height: null,
+    backgroundColor: 'white',
+    resizeMode: 'cover',
+  },
+
 });
