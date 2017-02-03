@@ -18,7 +18,6 @@ type Props = {
 
 export default function ArtistList(props: Props) {
   const {limit = 5} = props;
-  //const limit: number = props.limit || 5;
 
   if (props.artists.length === 0) {
     return null;
