@@ -11,8 +11,8 @@ import {
   TouchableHighlight,
 } from 'react-native';
 import {Actions as RouterActions} from 'react-native-router-flux';
-import type {Artist, Album, Track } from '../types'
-import spotify from '../spotify'
+import type {Artist, Album, Track, ArtistTrackMap } from '../types'
+import * as dal from '../dal'
 import Error from '../components/Error'
 import RelatedArtists from '../components/RelatedArtists'
 
@@ -30,14 +30,10 @@ export default class ArtistView extends Component {
   props: Props;
   state: State = {
     relatedArtists: {artists: []},
+    artistTrackMap: {},
     loading: false,
     error: '',
   };
-
-  constructor(...args: Array<any>) {
-    super(...args);
-
-  }
 
   render() {
     const { loading, error } = this.state;

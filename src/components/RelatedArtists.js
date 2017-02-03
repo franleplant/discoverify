@@ -11,8 +11,8 @@ import {
   TouchableHighlight,
 } from 'react-native';
 import {Actions as RouterActions} from 'react-native-router-flux';
-import type {Artist, Album, Track } from '../types'
-import spotify from '../spotify'
+import type {Artist, Album, Track, ArtistTrackMap } from '../types'
+import * as dal from '../dal'
 import Error from './Error'
 import ArtistList from './ArtistList'
 
@@ -23,30 +23,36 @@ type Props = {
 type State = {
   loading: boolean,
   error: string,
-  data: Array<Artist>,
+  artists: Array<Artist>,
+  artistTrackMap: ArtistTrackMap,
 }
 
 export default class RelatedArtistsView extends Component {
   props: Props;
   state: State = {
-    data: [],
+    artists: [],
+    artistTrackMap: {},
     loading: true,
     error: '',
   };
 
-  constructor(...args: Array<any>) {
-    super(...args);
-  }
-
   componentDidMount() {
-    this.fetchData(this.props.artistId)
+    this.fetchArtists(this.props.artistId)
   }
 
-  fetchData = async (artistId: string) => {
+  fetchArtists = async (artistId: string) => {
     try {
-      const res = await spotify.getArtistRelatedArtists(artistId);
+      const res = await dal.spotify.getArtistRelatedArtists(artistId);
+
+      let artists = []
+      try {
+        artists = res.body.artists;
+      } catch(er) {}
+
+      const artistTrackMap = await dal.fetchArtistsTopTracks(artists.map(a => a.id))
       this.setState(state => {
-        state.data = res.body.artists;
+        state.artists = artists;
+        state.artistTrackMap = artistTrackMap;
         state.loading = false;
         return state;
       })
@@ -59,19 +65,16 @@ export default class RelatedArtistsView extends Component {
         return state;
       })
     }
-
   }
 
   render() {
-    const { loading, error, data } = this.state;
+    const { loading, error, artists, artistTrackMap } = this.state;
 
     return (
       <View style={styles.container}>
-
         <Error msg={error} />
         <ActivityIndicator animating={loading} style={{margin: 10}}/>
-
-        <ArtistList artists={data} title={`Related Artists`} limit={20}/>
+        <ArtistList artists={artists} title={`Related Artists`} limit={20} topTracks={artistTrackMap}/>
       </View>
     );
   }

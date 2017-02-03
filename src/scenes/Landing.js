@@ -10,9 +10,9 @@ import {
   ActivityIndicator,
   ScrollView,
 } from 'react-native';
-import type {Artist, Album, Track } from '../types'
+import type {Artist, Album, Track, ArtistTrackMap } from '../types'
 import routes from '../routes'
-import spotify from '../spotify'
+import * as dal from '../dal'
 import Error from '../components/Error'
 import ArtistList from '../components/ArtistList'
 
@@ -23,9 +23,7 @@ type State = {
   loading: boolean,
   error: string,
   results: SearchResults,
-  artistTrackMap: {
-    [artistId: string]: Array<Track>,
-  },
+  artistTrackMap: ArtistTrackMap,
   fields: {
     searchTerm: string;
   }
@@ -71,7 +69,7 @@ export default class Landing extends Component {
 
 
     try {
-      const data = await spotify.search(searchTerm, ['album', 'artist', 'track'])
+      const data = await dal.spotify.search(searchTerm, ['album', 'artist', 'track'])
       console.log(data.body)
 
       let artists = []
@@ -79,7 +77,7 @@ export default class Landing extends Component {
         artists = data.body.artists.items;
       } catch(er) {}
 
-      const artistTrackMap = await this.fetchArtistsTopTracks(artists.map(a => a.id))
+      const artistTrackMap = await dal.fetchArtistsTopTracks(artists.map(a => a.id))
       console.log(artistTrackMap)
 
       this.setState(state => {
@@ -98,17 +96,6 @@ export default class Landing extends Component {
         return state;
       });
     }
-  }
-
-  fetchArtistsTopTracks = async (ids: Array<string>) => {
-    const responses = await Promise.all(ids.map(id => spotify.getArtistTopTracks(id, 'Ar')))
-    const artistTrackMap = {}
-    responses.forEach((res, i) => {
-      const artistId = ids[i];
-      artistTrackMap[artistId] = res.body.tracks;
-    })
-
-    return artistTrackMap;
   }
 
   handleChange = (fieldName: string, value: string) => {
