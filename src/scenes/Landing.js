@@ -43,9 +43,9 @@ type SearchResultItem<T> = {
 }
 
 type SearchResults = {
-  albums: ?SearchResultItem<Album>,
-  artist: ?SearchResultItem<Artist>,
-  tracks: ?SearchResultItem<Tracks>,
+  albums?: SearchResultItem<Album>,
+  artist?: SearchResultItem<Artist>,
+  tracks?: SearchResultItem<Track>,
 }
 
 
