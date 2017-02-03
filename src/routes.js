@@ -1,18 +1,14 @@
-import { Navigator } from 'react-native';
+import {Actions} from 'react-native-router-flux';
 
 import Landing from './scenes/Landing'
 import Artist from './scenes/Artist'
 
-export const ROUTES = [
-  {Component: Landing, index: 'Landing'},
-  {Component: Artist, index: 'Artist'},
-]
 
-export default function routes(index: string, params: any) {
-  const res = ROUTES.find(el => el.index === index)
-  if (!res) {
-    throw new Error(`Route not found`);
-  }
+const scenes = Actions.create(
+  <Scene key="root">
+    <Scene initial={true} key="Landing" component={Landing} title="Landing"/>
+    <Scene key="Artist" component={Artist} title="Artist"/>
+  </Scene>
+);
 
-  return Object.assign({}, res, {params});
-}
+export default scenes;

@@ -8,12 +8,12 @@ import {
   TouchableHighlight,
   Image,
 } from 'react-native';
+import {Actions as RouterActions} from 'react-native-router-flux';
 import type {Artist } from '../types'
 
 type Props = {
   artists: Array<Artist>,
   limit?: number,
-  onArtistPress: (artist: Artist) => any,
 }
 
 export default function ArtistList(props: Props) {
@@ -31,7 +31,7 @@ export default function ArtistList(props: Props) {
         <TouchableHighlight
           key={index}
           style={styles.touchableItemContainer}
-          onPress={() => props.onArtistPress(artist)}
+          onPress={() => RouterActions.Artist({artist})}
         >
           <View style={styles.itemContainer}>
             <Image style={styles.artistImage} source={{uri: artist.images[0] ? artist.images[0].url : undefined}}/>

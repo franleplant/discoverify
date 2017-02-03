@@ -17,11 +17,6 @@ import Error from '../components/Error'
 import ArtistList from '../components/ArtistList'
 
 type Props = {
-  router: {
-    navigator: any,
-    routes: any,
-    params: any,
-  },
 }
 
 type State = {
@@ -33,6 +28,12 @@ type State = {
   }
 }
 
+type SearchResults = {
+  albums?: SearchResultItem<Album>,
+  artists?: SearchResultItem<Artist>,
+  tracks?: SearchResultItem<Track>,
+}
+
 type SearchResultItem<T> = {
   href: string,
   items: Array<T>,
@@ -42,11 +43,6 @@ type SearchResultItem<T> = {
   offset: number,
 }
 
-type SearchResults = {
-  albums?: SearchResultItem<Album>,
-  artist?: SearchResultItem<Artist>,
-  tracks?: SearchResultItem<Track>,
-}
 
 
 export default class Landing extends Component {
@@ -96,13 +92,10 @@ export default class Landing extends Component {
     })
   }
 
-  handleArtistPress = (artist: Artist) => {
-    this.props.router.navigator.push(routes('Artist', artist))
-  }
-
   render() {
     const {loading, error, fields, results} = this.state;
-    const noResults = (!results.artists && !results.albums && !results.tracks)
+    const { artists, albums, tracks }: SearchResults = results;
+    const noResults = (!artists && !albums && !tracks)
 
     return (
       <ScrollView style={styles.container} keyboardShouldPersistTaps={'always'}>
@@ -131,7 +124,7 @@ export default class Landing extends Component {
           </Text>
         }
 
-        <ArtistList artists={results.artists ? results.artists.items : []} onArtistPress={this.handleArtistPress}/>
+        <ArtistList artists={artists ? artists.items : []}/>
 
       </ScrollView>
     );

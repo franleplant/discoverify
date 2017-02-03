@@ -18,8 +18,17 @@ type Props = {
   },
 }
 
+type State = {
+  loading: boolean,
+  error: string,
+}
+
 export default class Main extends Component {
   props: Props;
+  state: State = {
+    loading: true,
+    error: '',
+  };
 
   render() {
     const error = '';

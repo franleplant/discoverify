@@ -9,26 +9,13 @@ import {
 } from 'react-native';
 import routes from './routes';
 
+import {Actions, Scene, Router} from 'react-native-router-flux';
+
 
 export default class App extends Component {
   render() {
     return (
-      <Navigator
-        initialRoute={routes('Landing')}
-        renderScene={(route, navigator) => {
-          const { Component } = route;
-          return (
-            <Component
-
-              router={{
-                navigator: navigator,
-                routes: routes,
-                params: route.params,
-              }}
-            />
-          )
-        }}
-      />
+      <Router scenes={routes}/>
     );
   }
 }
