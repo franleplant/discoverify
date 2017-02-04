@@ -15,9 +15,11 @@ import type {Artist, Album, Track, ArtistTrackMap } from '../types'
 import * as dal from '../dal'
 import Error from '../components/Error'
 import RelatedArtists from '../components/RelatedArtists'
+import * as appStyles from '../appStyles'
 
 type Props = {
   artist: Artist,
+  tracks?: Array<Track>,
 }
 
 type State = {
@@ -37,7 +39,7 @@ export default class ArtistView extends Component {
 
   render() {
     const { loading, error } = this.state;
-    const artist = this.props.artist;
+    const { artist, tracks } = this.props;
     const artistId = artist.id;
     const images = artist.images;
     const imageSource = { uri: images[0] ? artist.images[0].url : undefined }
@@ -62,11 +64,32 @@ export default class ArtistView extends Component {
         <View
           style={{
             flexDirection: 'row',
+            overflow: 'hidden',
           }}
         >
-          <Text style={{color: 'white', marginRight: 20}}>Genres:</Text>
-          <Text style={{color: 'white'}}>{artist.genres.join(', ')}</Text>
+          <Text style={{color: 'white', marginRight: 20, width: 60}}>Genres:</Text>
+          <Text style={{color: 'white', flex: 1}} numberOfLines={1}>{artist.genres.join(', ')}</Text>
         </View>
+
+        { tracks && tracks.length &&
+
+        <View
+          style={{
+            flexDirection: 'row',
+            height: 40,
+            padding: 10,
+            marginTop: 10,
+            backgroundColor: appStyles.colors.purple,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Text style={{color: 'white', flex:1, marginRight: 20, fontSize: 15}} onPress={() => RouterActions.TrackPreview({track: tracks[0]})}>
+            Preview a song
+          </Text>
+          <Text style={{color: 'white', fontSize: 20, width: 30 }}>{`\u25B6`}</Text>
+        </View>
+        }
 
 
         <RelatedArtists artistId={artistId}/>

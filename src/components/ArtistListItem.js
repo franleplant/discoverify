@@ -21,13 +21,15 @@ export default function ArtistListItem(props: Props) {
   let trackPreview = null;
   if (topTracks) {
     trackPreview = (
-      <Text style={{width: 30}} onPress={() => RouterActions.TrackPreview({track: topTracks[0]})}>Play</Text>
+      <Text style={{width: 30, color: 'white', fontSize: 20}} onPress={() => RouterActions.TrackPreview({track: topTracks[0]})}>
+        {`\u25B6`}
+      </Text>
     )
   }
   return (
     <TouchableHighlight
       style={styles.touchableItemContainer}
-      onPress={() => RouterActions.Artist({artist})}
+      onPress={() => RouterActions.Artist({artist, tracks: topTracks})}
     >
       <View style={styles.itemContainer}>
         <Image style={styles.artistImage} source={{uri: artist.images[0] ? artist.images[0].url : undefined}}/>

@@ -15,6 +15,7 @@ import Video from 'react-native-video';
 import type {Artist, Album, Track, ArtistTrackMap } from '../types'
 import * as dal from '../dal'
 import Error from '../components/Error'
+import * as appStyles from '../appStyles'
 
 type Props = {
   track: Track,
@@ -113,13 +114,13 @@ export default class TrackPreview extends Component {
         <View style={{
           height: 10,
           borderWidth: 1,
-          borderColor: '#663399',
+          borderColor: appStyles.colors.purple,
           width: 300,
           alignSelf: 'center',
         }}>
           <View style={{
             height: 8,
-            backgroundColor: '#663399',
+            backgroundColor: appStyles.colors.purple,
             width: (progress.current / progress.max) * 300,
           }}>
           </View>

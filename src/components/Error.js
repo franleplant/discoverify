@@ -6,6 +6,7 @@ import {
   Text,
   View
 } from 'react-native';
+import * as appStyles from '../appStyles'
 
 type Props = {
   msg: string,
@@ -30,7 +31,7 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#D91E18',
+    backgroundColor: appStyles.colors.red,
   },
 
   text: {

@@ -15,6 +15,7 @@ import routes from '../routes'
 import * as dal from '../dal'
 import Error from '../components/Error'
 import ArtistList from '../components/ArtistList'
+import * as appStyles from '../appStyles'
 
 type Props = {
 }
@@ -153,7 +154,7 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingLeft: 20,
     paddingRight: 20,
-    backgroundColor: '#2C3E50',
+    backgroundColor: appStyles.colors.darkBlue,
   },
 
   searchContainer: {
@@ -173,7 +174,7 @@ const styles = StyleSheet.create({
   searchButton: {
     width: 80,
     height: 40,
-    backgroundColor: '#663399',
+    backgroundColor: appStyles.colors.purple,
     padding: 10,
     justifyContent: 'center',
     alignItems: 'center'
