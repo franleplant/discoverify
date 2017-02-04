@@ -29,7 +29,7 @@ export default function ArtistListItem(props: Props) {
   return (
     <TouchableHighlight
       style={styles.touchableItemContainer}
-      onPress={() => RouterActions.Artist({artist, tracks: topTracks})}
+      onPress={() => RouterActions.Artist({artistId: artist.id, artist, tracks: topTracks})}
     >
       <View style={styles.itemContainer}>
         <Image style={styles.artistImage} source={{uri: artist.images[0] ? artist.images[0].url : undefined}}/>

@@ -143,6 +143,7 @@ export default class Landing extends Component {
         }
 
         <ArtistList artists={artists ? artists.items : []} topTracks={artistTrackMap}/>
+        <View style={{height: 20}}></View>
         <TrackList tracks={tracks ? tracks.items : [] } />
 
       </ScrollView>

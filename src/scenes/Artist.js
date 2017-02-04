@@ -18,45 +18,107 @@ import RelatedArtists from '../components/RelatedArtists'
 import * as appStyles from '../appStyles'
 
 type Props = {
-  artist: Artist,
+  artistId: string,
+  artist?: Artist,
   tracks?: Array<Track>,
 }
 
 type State = {
   loading: boolean,
   error: string,
+  artist: ?Artist,
+  tracks: Array<Track>,
 }
 
 
 export default class ArtistView extends Component {
+  static defaultProps = {
+    tracks: [],
+  }
+
   props: Props;
   state: State = {
-    relatedArtists: {artists: []},
-    artistTrackMap: {},
+    artist: null,
+    tracks: [],
     loading: false,
     error: '',
   };
 
+
+  componentDidMount() {
+    this.fetchArtistIfNecessary(this.props);
+  }
+
+  componentWillReceiveProps(nextProps: Props) {
+    this.fetchArtistIfNecessary(nextProps);
+  }
+
+  async fetchArtistIfNecessary(props: Props) {
+    if (props.artist) {
+      this.setState(state => {
+        state.artist = props.artist;
+        state.tracks = props.tracks;
+        return state
+      })
+      return;
+    }
+
+    this.setState(state => {
+      state.loading = true;
+      return state
+    })
+
+    try {
+      //const res = await dal.spotify.getArtistTopTracks(props.artistId, 'Ar')
+      //debugger
+      const [artistResponse, tracksResponse ] = await Promise.all([
+        dal.spotify.getArtist(props.artistId),
+        dal.spotify.getArtistTopTracks(props.artistId, 'Ar'),
+      ])
+
+
+      this.setState(state => {
+        state.loading = false;
+        state.artist = artistResponse.body;
+        state.tracks = tracksResponse.body.tracks;
+        return state
+      })
+
+    } catch (err) {
+      console.log(`Error fetching artist`, err);
+      this.setState(state => {
+        state.loading = false;
+        state.error = 'Something went wrong, please try again';
+        return state
+      })
+    }
+  }
+
   render() {
-    const { loading, error } = this.state;
-    const { artist, tracks } = this.props;
-    const artistId = artist.id;
+    const { artistId } = this.props;
+    const { loading, error, artist, tracks } = this.state;
+
+    if (!artist) {
+      return (
+        <ScrollView style={styles.container} keyboardShouldPersistTaps={'always'}>
+          <Error msg={error} />
+          <ActivityIndicator animating={loading} style={{margin: 10}}/>
+        </ScrollView>
+      )
+    }
+
     const images = artist.images;
-    const imageSource = { uri: images[0] ? artist.images[0].url : undefined }
+    const image = images[0] ? images[0].url : undefined
 
     return (
       <ScrollView style={styles.container} keyboardShouldPersistTaps={'always'}>
         <Error msg={error} />
         <ActivityIndicator animating={loading} style={{margin: 10}}/>
 
-        <View style={{
-          flexDirection: 'row',
-          minHeight: 200,
-          marginBottom: 20,
-        }}>
+        <View style={styles.artistBanner}>
 
           <View style={styles.artistImageContainer}>
-            <Image style={styles.artistImage} source={imageSource}/>
+            <Image style={styles.artistImage} source={{uri: image}}/>
           </View>
           <Text style={styles.title}>{artist.name}</Text>
         </View>
@@ -71,8 +133,7 @@ export default class ArtistView extends Component {
           <Text style={{color: 'white', flex: 1}} numberOfLines={1}>{artist.genres.join(', ')}</Text>
         </View>
 
-        { tracks && tracks.length &&
-
+        { tracks.length !== 0 &&
         <View
           style={{
             flexDirection: 'row',
@@ -93,8 +154,6 @@ export default class ArtistView extends Component {
 
 
         <RelatedArtists artistId={artistId}/>
-
-
       </ScrollView>
     );
   }
@@ -107,6 +166,12 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     paddingRight: 20,
     backgroundColor: '#2C3E50',
+  },
+
+  artistBanner: {
+    flexDirection: 'row',
+    minHeight: 200,
+    marginBottom: 20,
   },
 
 
