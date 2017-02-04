@@ -21,7 +21,7 @@ export default function ArtistListItem(props: Props) {
   let trackPreview = null;
   if (topTracks) {
     trackPreview = (
-      <Text style={{width: 30}}>Play</Text>
+      <Text style={{width: 30}} onPress={() => RouterActions.TrackPreview({track: topTracks[0]})}>Play</Text>
     )
   }
   return (

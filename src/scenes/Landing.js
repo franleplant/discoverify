@@ -58,6 +58,9 @@ export default class Landing extends Component {
     }
   };
 
+  componentDidMount() {
+  }
+
   handleSearch = async () => {
     const searchTerm = this.state.fields.searchTerm;
 
