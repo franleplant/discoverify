@@ -87,7 +87,7 @@ export default class ArtistView extends Component {
           <Text style={{color: 'white', flex:1, marginRight: 20, fontSize: 15}} onPress={() => RouterActions.TrackPreview({track: tracks[0]})}>
             Preview a song
           </Text>
-          <Text style={{color: 'white', fontSize: 20, width: 30 }}>{`\u25B6`}</Text>
+          <Text style={{color: 'white', fontSize: 20, width: 30 }} onPress={() => RouterActions.TrackPreview({track: tracks[0]})}>{`\u25B6`}</Text>
         </View>
         }
 

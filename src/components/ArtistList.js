@@ -63,6 +63,7 @@ export default class ArtistList extends React.Component {
       <View style={{}}>
         <Text style={styles.title}>{title}</Text>
         <ListView
+          keyboardShouldPersistTaps={'always'}
           enableEmptySections={true}
           dataSource={this.state.dataSource}
           renderRow={(artist) => (

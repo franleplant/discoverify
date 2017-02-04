@@ -91,9 +91,20 @@ export default class TrackPreview extends Component {
     return (
       <View style={styles.container}>
 
-        <Text style={styles.title}>Name: {track.name}</Text>
-        <Text style={styles.title}>Album: {track.name}</Text>
-        <Text style={styles.title}>Artist: {track.artists.map(a => a.name).join(', ')}</Text>
+        <View style={styles.textRow}>
+          <Text style={[styles.title, styles.textRowHeader]}>Name:</Text>
+          <Text style={[styles.title, {flex: 1}]} numberOfLines={1}>{track.name}</Text>
+        </View>
+
+        <View style={styles.textRow}>
+          <Text style={[styles.title, styles.textRowHeader]}>Album:</Text>
+          <Text style={[styles.title, {flex: 1}]} numberOfLines={1}>{track.album.name}</Text>
+        </View>
+
+        <View style={styles.textRow}>
+          <Text style={[styles.title, styles.textRowHeader]}>Artists:</Text>
+          <Text style={[styles.title, {flex: 1}]} numberOfLines={1}>{track.artists.map(a => a.name).join(', ')}</Text>
+        </View>
 
         <Error msg={error} />
         <ActivityIndicator animating={loading} style={{margin: 10}}/>
@@ -160,8 +171,6 @@ const styles = StyleSheet.create({
 
 
   title: {
-    padding: 20,
-    height: 60,
     alignSelf: 'center',
     fontSize: 20,
     color: 'white',
@@ -179,6 +188,18 @@ const styles = StyleSheet.create({
     height: null,
     backgroundColor: 'white',
     resizeMode: 'cover',
+  },
+
+  textRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    overflow: 'hidden',
+    marginBottom: 20,
+  },
+
+  textRowHeader: {
+    marginRight: 20,
+    width: 70,
   },
 
 });
