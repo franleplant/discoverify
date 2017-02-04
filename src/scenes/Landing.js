@@ -10,12 +10,13 @@ import {
   ActivityIndicator,
   ScrollView,
 } from 'react-native';
+import * as appStyles from '../appStyles'
 import type {Artist, Album, Track, ArtistTrackMap } from '../types'
-import routes from '../routes'
 import * as dal from '../dal'
+import routes from '../routes'
 import Error from '../components/Error'
 import ArtistList from '../components/ArtistList'
-import * as appStyles from '../appStyles'
+import TrackList from '../components/TrackList'
 
 type Props = {
 }
@@ -142,6 +143,7 @@ export default class Landing extends Component {
         }
 
         <ArtistList artists={artists ? artists.items : []} topTracks={artistTrackMap}/>
+        <TrackList tracks={tracks ? tracks.items : [] } />
 
       </ScrollView>
     );
