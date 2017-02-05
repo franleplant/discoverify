@@ -136,7 +136,7 @@ export default class Landing extends Component {
         <ActivityIndicator animating={loading} style={{margin: 10}}/>
 
         { noResults &&
-          <Text style={{color: 'white'}}>
+          <Text style={{color: 'white', width: 200, fontSize: 18, marginTop: 100, textAlign: 'center', alignSelf: 'center'}}>
           Search for Artists, Albums and Tracks and tap them to see
           more content like it.
           </Text>
