@@ -21,7 +21,7 @@ export default function ArtistListItem(props: Props) {
   let trackPreview = null;
   if (topTracks) {
     trackPreview = (
-      <Text style={{width: 30, color: 'white', fontSize: 20}} onPress={() => RouterActions.TrackPreview({track: topTracks[0]})}>
+      <Text style={{width: 50, color: 'white', fontSize: 20, textAlign: 'right'}} onPress={() => RouterActions.TrackPreview({track: topTracks[0]})}>
         {`\u25B6`}
       </Text>
     )

@@ -35,7 +35,7 @@ export default function TrackListItem(props: Props) {
         <Text style={styles.itemText}>
           {`${track.name} by ${artist.name}`}
         </Text>
-        <Text style={{width: 30, color: 'white', fontSize: 20}} onPress={() => RouterActions.TrackPreview({track: track})}>
+        <Text style={{width: 50, color: 'white', fontSize: 20, textAlign: 'right'}} onPress={() => RouterActions.TrackPreview({track: track})}>
           {`\u25B6`}
         </Text>
       </View>
