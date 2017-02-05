@@ -69,8 +69,6 @@ export default class ArtistView extends Component {
     })
 
     try {
-      //const res = await dal.spotify.getArtistTopTracks(props.artistId, 'Ar')
-      //debugger
       const [artistResponse, tracksResponse ] = await Promise.all([
         dal.spotify.getArtist(props.artistId),
         dal.spotify.getArtistTopTracks(props.artistId, 'Ar'),
@@ -128,7 +126,7 @@ export default class ArtistView extends Component {
         </View>
 
         { tracks.length !== 0 &&
-        <TouchableHighlight style={styles.trackPreviewTouchable} onPress={() => RouterActions.TrackPreview({track: tracks[0]})}>
+        <TouchableHighlight style={styles.trackPreviewTouchable} onPress={() => RouterActions.TrackSelection({tracks})}>
           <View style={styles.trackPreviewContainer}>
             <Text style={{color: 'white', flex:1, marginRight: 20, fontSize: 15}}>
               Preview a song
