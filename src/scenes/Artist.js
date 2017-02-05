@@ -116,40 +116,26 @@ export default class ArtistView extends Component {
         <ActivityIndicator animating={loading} style={{margin: 10}}/>
 
         <View style={styles.artistBanner}>
-
           <View style={styles.artistImageContainer}>
             <Image style={styles.artistImage} source={{uri: image}}/>
           </View>
           <Text style={styles.title}>{artist.name}</Text>
         </View>
 
-        <View
-          style={{
-            flexDirection: 'row',
-            overflow: 'hidden',
-          }}
-        >
-          <Text style={{color: 'white', marginRight: 20, width: 60}}>Genres:</Text>
-          <Text style={{color: 'white', flex: 1}} numberOfLines={1}>{artist.genres.join(', ')}</Text>
+        <View style={styles.genresContainer}>
+          <Text style={{color: 'white', width: 60}}>Genres:</Text>
+          <Text style={{color: 'white', flex: 1}} numberOfLines={2}>{artist.genres.join(', ')}</Text>
         </View>
 
         { tracks.length !== 0 &&
-        <View
-          style={{
-            flexDirection: 'row',
-            height: 40,
-            padding: 10,
-            marginTop: 10,
-            backgroundColor: appStyles.colors.purple,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <Text style={{color: 'white', flex:1, marginRight: 20, fontSize: 15}} onPress={() => RouterActions.TrackPreview({track: tracks[0]})}>
-            Preview a song
-          </Text>
-          <Text style={{color: 'white', fontSize: 20, width: 30 }} onPress={() => RouterActions.TrackPreview({track: tracks[0]})}>{`\u25B6`}</Text>
-        </View>
+        <TouchableHighlight style={styles.trackPreviewTouchable} onPress={() => RouterActions.TrackPreview({track: tracks[0]})}>
+          <View style={styles.trackPreviewContainer}>
+            <Text style={{color: 'white', flex:1, marginRight: 20, fontSize: 15}}>
+              Preview a song
+            </Text>
+            <Text style={{color: 'white', fontSize: 20, width: 30 }}>{`\u25B6`}</Text>
+          </View>
+        </TouchableHighlight>
         }
 
 
@@ -196,5 +182,25 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     resizeMode: 'cover',
   },
+
+  genresContainer: {
+    flexDirection: 'row',
+    overflow: 'hidden',
+  },
+
+
+  trackPreviewContainer: {
+    flexDirection: 'row',
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  trackPreviewTouchable: {
+    height: 40,
+    padding: 10,
+    marginTop: 10,
+    backgroundColor: appStyles.colors.purple,
+  }
 
 });

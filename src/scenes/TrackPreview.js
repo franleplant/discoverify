@@ -109,17 +109,8 @@ export default class TrackPreview extends Component {
         <Error msg={error} />
         <ActivityIndicator animating={loading} style={{margin: 10}}/>
 
-        <View style={{
-          width: 300,
-          height: 300,
-        }}>
-          <Image source={{uri: track.album.images[0].url}} style={{
-            flex: 1,
-            height: null,
-            width: null,
-            resizeMode: 'cover',
-            marginBottom: 20,
-          }}/>
+        <View style={styles.imageContainer}>
+          <Image source={{uri: track.album.images[0].url}} style={styles.image}/>
         </View>
 
         <View style={{
@@ -146,12 +137,10 @@ export default class TrackPreview extends Component {
           muted={false}                  // Mutes the audio entirely.
           paused={false}                 // Pauses playback entirely.
           resizeMode="cover"             // Fill the whole screen at aspect ratio.
-          onLoadStart={this.handleLoadEnd}   // Callback when video starts to load
           onLoad={this.handleLoadEnd}      // Callback when video loads
           onProgress={this.handleProgress}      // Callback every ~250ms with currentTime
           onEnd={this.handleEnd}             // Callback when playback finishes
           onError={this.handleError}      // Callback when video cannot be loaded
-          onBuffer={this.handleLoadStart}
         />
 
       </View>
@@ -200,6 +189,19 @@ const styles = StyleSheet.create({
   textRowHeader: {
     marginRight: 20,
     width: 70,
+  },
+
+  imageContainer: {
+    width: 300,
+    height: 300,
+  },
+
+  image: {
+    flex: 1,
+    height: null,
+    width: null,
+    resizeMode: 'cover',
+    marginBottom: 20,
   },
 
 });
