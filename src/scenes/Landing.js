@@ -75,7 +75,7 @@ export default class Landing extends Component {
 
 
     try {
-      const data = await dal.spotify.search(searchTerm, ['album', 'artist', 'track'])
+      const data = await dal.search(searchTerm, ['album', 'artist', 'track'])
       console.log(data.body)
 
       let artists = []

@@ -19,14 +19,13 @@ import * as appStyles from '../appStyles'
 
 type Props = {
   artistId: string,
-  artist?: Artist,
   tracks?: Array<Track>,
 }
 
 type State = {
+  artist: ?Artist,
   loading: boolean,
   error: string,
-  artist: ?Artist,
   tracks: Array<Track>,
 }
 
@@ -54,31 +53,24 @@ export default class ArtistView extends Component {
   }
 
   async fetchArtistIfNecessary(props: Props) {
-    if (props.artist) {
-      this.setState(state => {
-        state.artist = props.artist;
-        state.tracks = props.tracks;
-        return state
-      })
-      return;
-    }
-
     this.setState(state => {
       state.loading = true;
       return state
     })
 
     try {
-      const [artistResponse, tracksResponse ] = await Promise.all([
-        dal.spotify.getArtist(props.artistId),
-        dal.spotify.getArtistTopTracks(props.artistId, 'Ar'),
-      ])
+      const artistResponse = await dal.getArtist(props.artistId)
+      let tracks = props.tracks;
+      if (!tracks){
+        const tracksResponse = await dal.spotify.getArtistTopTracks(props.artistId, 'Ar')
+        tracks = tracksResponse.body.tracks
+      }
 
 
       this.setState(state => {
         state.loading = false;
         state.artist = artistResponse.body;
-        state.tracks = tracksResponse.body.tracks;
+        state.tracks = tracks;
         return state
       })
 
