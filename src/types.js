@@ -14,7 +14,18 @@ export type Artist = {
   uri: string,
 }
 
-export type Album = {}
+export type Album = {
+  album_type: string,
+  artists: Array<TrackArtist>,
+  available_markets: Array<string>,
+  external_urls: any,
+  href: string,
+  id: string,
+  images: Array<SpotifyImage>,
+  name: string,
+  type: string,
+  uri: string,
+}
 
 export type TrackArtist = {
   external_urls: any,

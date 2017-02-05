@@ -17,6 +17,7 @@ import routes from '../routes'
 import Error from '../components/Error'
 import ArtistList from '../components/ArtistList'
 import TrackList from '../components/TrackList'
+import AlbumList from '../components/AlbumList'
 
 type Props = {
 }
@@ -145,6 +146,8 @@ export default class Landing extends Component {
         <ArtistList artists={artists ? artists.items : []} topTracks={artistTrackMap}/>
         <View style={{height: 20}}></View>
         <TrackList tracks={tracks ? tracks.items : [] } />
+        <View style={{height: 20}}></View>
+        <AlbumList albums={albums ? albums.items : [] } />
 
       </ScrollView>
     );
