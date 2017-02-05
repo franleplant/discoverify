@@ -32,7 +32,7 @@ export default function AlbumListItem(props: Props) {
     >
       <View style={styles.itemContainer}>
         <Image style={styles.artistImage} source={{uri: image}}/>
-        <Text style={styles.itemText}>
+        <Text style={styles.itemText} numberOfLines={2}>
           {`${album.name} by ${artist.name}`}
         </Text>
         {/*

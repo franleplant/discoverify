@@ -33,7 +33,7 @@ export default function ArtistListItem(props: Props) {
     >
       <View style={styles.itemContainer}>
         <Image style={styles.artistImage} source={{uri: artist.images[0] ? artist.images[0].url : undefined}}/>
-        <Text style={styles.itemText}>
+        <Text style={styles.itemText} numberOfLines={2}>
           {artist.name}
         </Text>
         {trackPreview}

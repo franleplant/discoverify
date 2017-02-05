@@ -32,7 +32,7 @@ export default function TrackListItem(props: Props) {
     >
       <View style={styles.itemContainer}>
         <Image style={styles.artistImage} source={{uri: image}}/>
-        <Text style={styles.itemText}>
+        <Text style={styles.itemText} numberOfLines={2}>
           {`${track.name} by ${artist.name}`}
         </Text>
         <Text style={{width: 50, color: 'white', fontSize: 20, textAlign: 'right'}} onPress={() => RouterActions.TrackPreview({track: track})}>
