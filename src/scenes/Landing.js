@@ -124,6 +124,8 @@ export default class Landing extends Component {
             value={fields.searchTerm}
             onChangeText={this.handleChange.bind(null, 'searchTerm')}
             style={styles.searchInput}
+            underlineColorAndroid={'rgba(0,0,0,0)'}
+            onSubmitEditing={this.handleSearch}
           />
 
           <TouchableHighlight onPress={this.handleSearch} style={styles.searchButton}>

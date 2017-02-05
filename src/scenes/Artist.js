@@ -9,6 +9,7 @@ import {
   Image,
   ActivityIndicator,
   TouchableHighlight,
+  Platform,
 } from 'react-native';
 import {Actions as RouterActions} from 'react-native-router-flux';
 import type {Artist, Album, Track, ArtistTrackMap } from '../types'
@@ -130,6 +131,10 @@ export default class ArtistView extends Component {
 
 
         <RelatedArtists artistId={artistId}/>
+
+        { Platform.OS === 'android' &&
+          <View style={{height: 100}} />
+        }
       </ScrollView>
     );
   }

@@ -32,7 +32,9 @@ export default function ArtistListItem(props: Props) {
       onPress={() => RouterActions.Artist({artistId: artist.id, tracks: topTracks})}
     >
       <View style={styles.itemContainer}>
-        <Image style={styles.artistImage} source={{uri: artist.images[0] ? artist.images[0].url : undefined}}/>
+        <View style={styles.artistImageContainer}>
+          <Image style={styles.artistImage} source={{uri: artist.images[0] ? artist.images[0].url : undefined}}/>
+        </View>
         <Text style={styles.itemText} numberOfLines={2}>
           {artist.name}
         </Text>
@@ -63,13 +65,20 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0)',
     color: 'white',
     flex: 1,
-    minWidth: 200,
+    minWidth: 150,
   },
 
-  artistImage: {
+  artistImageContainer: {
     width: 40,
     height: 40,
     backgroundColor: 'white',
     marginRight: 20
+  },
+
+  artistImage: {
+    flex: 1,
+    width: null,
+    height: null,
+    resizeMode: 'cover',
   },
 });
