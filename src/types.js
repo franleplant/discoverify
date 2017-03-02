@@ -1,5 +1,14 @@
 //@flow
+import type { AppState as AppStateAlias } from './store/reducers';
 
+export type { AppState } from './store/reducers';
+export type GetState = () => AppStateAlias;
+
+export type Action<Payload> = {
+  type: string,
+  error?: boolean,
+  payload: Payload,
+}
 
 export type Artist = {
   name: string,

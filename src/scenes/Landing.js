@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import {
   AppRegistry,
   StyleSheet,
@@ -11,97 +12,64 @@ import {
   ScrollView,
 } from 'react-native';
 import * as appStyles from '../appStyles'
-import type {Artist, Album, Track, ArtistTrackMap } from '../types'
+import type { AppState, Artist, Album, Track, ArtistTrackMap } from '../types'
 import * as dal from '../dal'
-import routes from '../routes'
 import Error from '../components/Error'
 import ArtistList from '../components/ArtistList'
 import TrackList from '../components/TrackList'
 import AlbumList from '../components/AlbumList'
+import * as actions from '../store/actions/search';
+import * as selectors from '../store/reducers/search';
+import * as topTracksSelectors from '../store/reducers/artistTopTracks';
 
-type Props = {
-}
+type OwnProps = { }
 
-type State = {
+type ReduxStateProps = {
   loading: boolean,
   error: string,
-  results: SearchResults,
-  artistTrackMap: ArtistTrackMap,
+  artists: Array<Artist>,
+  tracks: Array<Track>,
+  albums: Array<Album>,
+  artistTopTrackMap: ArtistTrackMap,
+};
+function mapStateToProps(state: AppState, ownProps: OwnProps): ReduxStateProps {
+  return {
+    loading: state.search.loading,
+    error: state.search.error,
+    artists: selectors.getArtists(state),
+    tracks: selectors.getTracks(state),
+    albums: selectors.getAlbums(state),
+    artistTopTrackMap: topTracksSelectors.getAllTracksByArtist(state)
+  }
+}
+
+type ReduxDispatchProps = {
+  search: (searchTerm: string) => any,
+}
+function mapDispatchToProps(dispatch: any): ReduxDispatchProps {
+  return {
+    search: (searchTerm: string) => dispatch(actions.search(searchTerm)),
+  };
+}
+
+type Props = OwnProps & ReduxStateProps & ReduxDispatchProps;
+
+type State = {
   fields: {
     searchTerm: string;
   }
 }
-
-type SearchResults = {
-  albums?: SearchResultItem<Album>,
-  artists?: SearchResultItem<Artist>,
-  tracks?: SearchResultItem<Track>,
-}
-
-type SearchResultItem<T> = {
-  href: string,
-  items: Array<T>,
-  limit: number,
-  next: string,
-  previous: string,
-  offset: number,
-}
-
-
-
-export default class Landing extends Component {
+export class Landing extends Component {
   props: Props;
   state: State = {
-    loading: false,
-    error: '',
-    results: {},
-    artistTrackMap: {},
     fields: {
       searchTerm: '',
     }
   };
 
-  componentDidMount() {
-  }
-
-  handleSearch = async () => {
+  handleSearch = () => {
     const searchTerm = this.state.fields.searchTerm;
-
-    this.setState(state => {
-      state.loading = true;
-      state.results = {};
-      return state;
-    });
-
-
-    try {
-      const data = await dal.search(searchTerm, ['album', 'artist', 'track'])
-      console.log(data.body)
-
-      let artists = []
-      try {
-        artists = data.body.artists.items;
-      } catch(er) {}
-
-      const artistTrackMap = await dal.fetchArtistsTopTracks(artists.map(a => a.id))
-      console.log(artistTrackMap)
-
-      this.setState(state => {
-        state.loading = false;
-        state.results = data.body;
-        state.artistTrackMap = artistTrackMap;
-        return state;
-      });
-
-
-    } catch (err) {
-      console.log('Something went wrong!', err);
-      this.setState(state => {
-        state.loading = false;
-        state.error = 'Something went wrong, please try again';
-        return state;
-      });
-    }
+    this.props.search(searchTerm);
   }
 
   handleChange = (fieldName: string, value: string) => {
@@ -112,9 +80,10 @@ export default class Landing extends Component {
   }
 
   render() {
-    const {loading, error, fields, results, artistTrackMap} = this.state;
-    const { artists, albums, tracks }: SearchResults = results;
-    const noResults = (!artists && !albums && !tracks)
+    const { loading, error, artists, tracks, albums, artistTopTrackMap } = this.props;
+    const { fields } = this.state;
+
+    const noResults = (!loading && !artists.length && !albums.length && !tracks.length)
 
     return (
       <ScrollView style={styles.container} keyboardShouldPersistTaps={'always'}>
@@ -145,16 +114,23 @@ export default class Landing extends Component {
           </Text>
         }
 
-        <ArtistList artists={artists ? artists.items : []} topTracks={artistTrackMap}/>
-        <View style={{height: 20}}></View>
-        <TrackList tracks={tracks ? tracks.items : [] } />
-        <View style={{height: 20}}></View>
-        <AlbumList albums={albums ? albums.items : [] } />
+        { !loading &&
+          <View>
+            <ArtistList artists={artists} topTracks={artistTopTrackMap}/>
+            <View style={{height: 20}}></View>
+            <TrackList tracks={tracks} />
+            <View style={{height: 20}}></View>
+            <AlbumList albums={albums} />
+          </View>
+        }
 
       </ScrollView>
     );
   }
 }
+
+const ConnectedComponent = connect(mapStateToProps, mapDispatchToProps)(Landing);
+export default ConnectedComponent;
 
 const styles = StyleSheet.create({
   container: {

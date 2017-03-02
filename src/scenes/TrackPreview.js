@@ -13,7 +13,6 @@ import {
 import {Actions as RouterActions} from 'react-native-router-flux';
 import Video from 'react-native-video';
 import type {Artist, Album, Track, ArtistTrackMap } from '../types'
-import * as dal from '../dal'
 import Error from '../components/Error'
 import * as appStyles from '../appStyles'
 

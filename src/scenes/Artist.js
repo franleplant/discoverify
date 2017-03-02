@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import {
   AppRegistry,
   StyleSheet,
@@ -12,82 +13,68 @@ import {
   Platform,
 } from 'react-native';
 import {Actions as RouterActions} from 'react-native-router-flux';
-import type {Artist, Album, Track, ArtistTrackMap } from '../types'
-import * as dal from '../dal'
+import type {Artist, Album, Track, ArtistTrackMap, AppState } from '../types'
 import Error from '../components/Error'
 import RelatedArtists from '../components/RelatedArtists'
 import * as appStyles from '../appStyles'
+import * as actions from '../store/actions/artists';
+import * as selectors from '../store/reducers/artists';
+import * as topTracksActions from '../store/actions/artistTopTracks'
+import * as topTracksSelectors from '../store/reducers/artistTopTracks'
 
-type Props = {
+type OwnProps = {
   artistId: string,
-  tracks?: Array<Track>,
 }
 
-type State = {
-  artist: ?Artist,
+type ReduxStateProps = {
   loading: boolean,
   error: string,
+  artist: Artist,
   tracks: Array<Track>,
+};
+function mapStateToProps(state: AppState, ownProps: OwnProps): ReduxStateProps {
+  return {
+    loading: state.artists.loading,
+    error: state.artists.error || state.artistTopTracks.error,
+    artist: selectors.getArtist(state, ownProps.artistId),
+    tracks: topTracksSelectors.getArtistTracks(state, ownProps.artistId),
+  }
+}
+
+type ReduxDispatchProps = {
+  fetchArtist: (artistId: string) => any,
+  fetchTopTracks: (artistId: string) => any,
+}
+function mapDispatchToProps(dispatch: any): ReduxDispatchProps {
+  return {
+    fetchArtist: (artistId: string) => dispatch(actions.fetchArtist(artistId)),
+    fetchTopTracks: (artistId: string) => dispatch(topTracksActions.fetchArtistTopTracks(artistId)),
+  };
+}
+
+type Props = OwnProps & ReduxStateProps & ReduxDispatchProps;
+
+type State = {
 }
 
 
-export default class ArtistView extends Component {
+export class ArtistView extends Component {
   static defaultProps = {
     tracks: [],
   }
 
   props: Props;
-  state: State = {
-    artist: null,
-    tracks: [],
-    loading: false,
-    error: '',
-  };
+  state: State = {};
 
 
   componentDidMount() {
-    this.fetchArtistIfNecessary(this.props);
-  }
-
-  componentWillReceiveProps(nextProps: Props) {
-    this.fetchArtistIfNecessary(nextProps);
-  }
-
-  async fetchArtistIfNecessary(props: Props) {
-    this.setState(state => {
-      state.loading = true;
-      return state
-    })
-
-    try {
-      const artistResponse = await dal.getArtist(props.artistId)
-      let tracks = props.tracks;
-      if (!tracks){
-        const tracksResponse = await dal.spotify.getArtistTopTracks(props.artistId, 'Ar')
-        tracks = tracksResponse.body.tracks
-      }
-
-
-      this.setState(state => {
-        state.loading = false;
-        state.artist = artistResponse.body;
-        state.tracks = tracks;
-        return state
-      })
-
-    } catch (err) {
-      console.log(`Error fetching artist`, err);
-      this.setState(state => {
-        state.loading = false;
-        state.error = 'Something went wrong, please try again';
-        return state
-      })
-    }
+    const props = this.props;
+    this.props.fetchArtist(props.artistId);
+    this.props.fetchTopTracks(props.artistId);
   }
 
   render() {
-    const { artistId } = this.props;
-    const { loading, error, artist, tracks } = this.state;
+    const { artistId, loading, error, artist, tracks } = this.props;
 
     if (!artist) {
       return (
@@ -139,6 +126,9 @@ export default class ArtistView extends Component {
     );
   }
 }
+
+const ConnectedComponent = connect(mapStateToProps, mapDispatchToProps)(ArtistView);
+export default ConnectedComponent;
 
 const styles = StyleSheet.create({
   container: {

@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import {
   AppRegistry,
   StyleSheet,
@@ -11,74 +12,76 @@ import {
   TouchableHighlight,
 } from 'react-native';
 import {Actions as RouterActions} from 'react-native-router-flux';
-import type {Artist, Album, Track, ArtistTrackMap } from '../types'
-import * as dal from '../dal'
-import Error from './Error'
-import ArtistList from './ArtistList'
+import type { AppState, Artist, Album, Track, ArtistTrackMap } from '../types';
+import Error from './Error';
+import ArtistList from './ArtistList';
+import * as actions from '../store/actions/relatedArtists';
+import * as selectors from '../store/reducers/relatedArtists';
+import * as topTracksSelectors from '../store/reducers/artistTopTracks';
 
-type Props = {
+
+
+type OwnProps = {
   artistId: string,
 }
 
-type State = {
+type ReduxStateProps = {
   loading: boolean,
   error: string,
   artists: Array<Artist>,
   artistTrackMap: ArtistTrackMap,
+};
+
+function mapStateToProps(state: AppState, ownProps: OwnProps): ReduxStateProps {
+  return {
+    loading: state.relatedArtists.loading || state.artistTopTracks.loading,
+    error: state.artists.error || state.artistTopTracks.error,
+    artists: selectors.getRelatedArtists(state, ownProps.artistId),
+    artistTrackMap: topTracksSelectors.getAllTracksByArtist(state)
+  }
 }
 
-export default class RelatedArtistsView extends Component {
-  props: Props;
-  state: State = {
-    artists: [],
-    artistTrackMap: {},
-    loading: true,
-    error: '',
+type ReduxDispatchProps = {
+  fetchArtistsAndTracks: (artistId: string) => any,
+}
+function mapDispatchToProps(dispatch: any): ReduxDispatchProps {
+  return {
+    fetchArtistsAndTracks: (artistId: string) => dispatch(actions.fetchRelatedArtistsAndTopTracks(artistId)),
   };
+}
+
+type Props = OwnProps & ReduxStateProps & ReduxDispatchProps;
+type State = {}
+
+export class RelatedArtistsView extends Component {
+  props: Props;
+  state: State = {};
 
   componentDidMount() {
-    this.fetchArtists(this.props.artistId)
-  }
-
-  fetchArtists = async (artistId: string) => {
-    try {
-      const res = await dal.spotify.getArtistRelatedArtists(artistId);
-
-      let artists = []
-      try {
-        artists = res.body.artists;
-      } catch(er) {}
-
-      const artistTrackMap = await dal.fetchArtistsTopTracks(artists.map(a => a.id))
-      this.setState(state => {
-        state.artists = artists;
-        state.artistTrackMap = artistTrackMap;
-        state.loading = false;
-        return state;
-      })
-
-    } catch (err) {
-      console.log('Error fetching related artists', err)
-      this.setState(state => {
-        state.error = 'Something went wrong, please try again'
-        state.loading = false;
-        return state;
-      })
-    }
+    //Little hack to avoid frame dropping on transitions
+    //This is a well known problem of the router Im using
+    setTimeout(() => {
+      this.props.fetchArtistsAndTracks(this.props.artistId);
+    }, 500);
   }
 
   render() {
-    const { loading, error, artists, artistTrackMap } = this.state;
+    const { loading, error, artists, artistTrackMap } = this.props;
 
     return (
       <View style={styles.container}>
         <Error msg={error} />
         <ActivityIndicator animating={loading} style={{margin: 10}}/>
-        <ArtistList artists={artists} title={`Related Artists`} limit={20} topTracks={artistTrackMap}/>
+        { !loading &&
+          <ArtistList artists={artists} title={`Related Artists`} limit={20} topTracks={artistTrackMap}/>
+        }
       </View>
     );
   }
 }
+
+const ConnectedComponent = connect(mapStateToProps, mapDispatchToProps)(RelatedArtistsView);
+export default ConnectedComponent;
 
 const styles = StyleSheet.create({
   container: {
